@@ -38,5 +38,5 @@ func sum(in []int) int {
 }
 
 func main() {
-	day3(read("input/day3.txt"))
+	day4(read("input/day4.txt"))
 }
