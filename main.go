@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func read(fileName string) []string {
@@ -29,6 +30,15 @@ func atoi(s string) int {
 	return v
 }
 
+func atoia(s string) []int {
+	nrs := strings.Split(s, " ")
+	var numbers []int
+	for _, n := range nrs {
+		numbers = append(numbers, atoi(n))
+	}
+	return numbers
+}
+
 func sum(in []int) int {
 	var s int
 	for _, i := range in {
@@ -38,5 +48,5 @@ func sum(in []int) int {
 }
 
 func main() {
-	day4(read("input/day4.txt"))
+	day5(read("input/day5.txt"))
 }
