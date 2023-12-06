@@ -1,4 +1,52 @@
-zlmlk1
+package main
+
+import (
+	"fmt"
+	"strconv"
+	"strings"
+	"unicode"
+)
+
+func main() {
+	lines := strings.Split(input, "\n")
+	var sum int
+	for _, line := range lines {
+		var digits []int
+		for _, char := range line {
+			if unicode.IsDigit(char) {
+				d, _ := strconv.Atoi(string(char))
+				digits = append(digits, d)
+			}
+		}
+		if len(digits) > 0 {
+			sum += digits[0]*10 + digits[len(digits)-1]
+		}
+	}
+	fmt.Printf("Day1 - part1 solution: %d\n", sum)
+
+	sum = 0
+	alfaNumberic := []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+	for _, line := range lines {
+		var digits []int
+		for pos, char := range line {
+			if unicode.IsDigit(char) {
+				d, _ := strconv.Atoi(string(char))
+				digits = append(digits, d)
+			}
+			for i, d := range alfaNumberic {
+				if len(d) <= len(line)-pos && line[pos:pos+len(d)] == d {
+					digits = append(digits, i+1)
+				}
+			}
+		}
+		if len(digits) > 1 {
+			sum += digits[0]*10 + digits[len(digits)-1]
+		}
+	}
+	fmt.Printf("Day1 - part2 solution: %d\n", sum)
+}
+
+var input = `zlmlk1
 vqjvxtc79mvdnktdsxcqc1sevenone
 vsskdclbtmjmvrseven6
 8jkfncbeight7seven8
@@ -997,4 +1045,4 @@ tfrrjmcvtbmktnxtxkkrcctmc33four5gfqpcjreight
 bmjhkkn4pgf
 qkrsvjclp23
 5fourzllbmcgkxsevengkrzkpvcmvgtxlrv6
-fivetczxxvjrrqfive1sevennvj6one3
+fivetczxxvjrrqfive1sevennvj6one3`

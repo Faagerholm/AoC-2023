@@ -1,4 +1,72 @@
-Card   1:  5 37 16  3 56 11 23 72  7  8 |  3 79 35 45 72 69 15 14 48 88 96 37 11 75 83 56 23  7 16 50 21 91 32 97 17
+package main
+
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	lines := strings.Split(input, "\n")
+	cards := make([][][]int, len(lines))
+	control := make([][]int, len(lines))
+	parse := func(s string) []int {
+		nrs := strings.Split(s, " ")
+		var numbers []int
+		for _, n := range nrs {
+			d, _ := strconv.Atoi(n)
+			numbers = append(numbers, d)
+		}
+		return numbers
+	}
+
+	points := func(winning, nrs []int) int {
+		var sum int
+		for _, w := range winning {
+			for _, n := range nrs {
+				if w == n && w != 0 {
+					if sum == 0 {
+						sum = 1
+					} else {
+						sum *= 2
+					}
+				}
+			}
+		}
+		return sum
+	}
+
+	// part1 - Count total points
+	var tot int
+	for idx, line := range lines {
+		scratch := strings.Split(line, " | ")
+		card := parse(strings.Trim(scratch[1], " "))
+		winning := parse(strings.Split(strings.Trim(scratch[0], " "), ":")[1])
+		tot += points(card, winning)
+
+		cards[idx] = append(cards[idx], card)
+		control[idx] = winning
+	}
+
+	// part2 - Count total number of scratch cards
+	var count int
+	for idx := range lines {
+		for _, c := range cards[idx] {
+			p := points(control[idx], c)
+			next := 1
+			for p >= 1 {
+				cards[idx+next] = append(cards[idx+next], cards[idx+next][0])
+				next++
+				p /= 2
+			}
+			count++
+		}
+	}
+	fmt.Printf("Day4 Part1 Solution: %d\n", tot)
+	fmt.Printf("Day4 Part2 Solution: %d\n", count)
+}
+
+var input = `Card   1:  5 37 16  3 56 11 23 72  7  8 |  3 79 35 45 72 69 15 14 48 88 96 37 11 75 83 56 23  7 16 50 21 91 32 97 17
 Card   2:  1 45 93 96 65 88 78 15 27 26 |  5 84 62 63 45 61  1 80 88 77 40 51 73 21 32 98 74 59 97  9 15 71 25 43 23
 Card   3:  9 99 34 44 37 16 67 43 41 83 | 43 41  5 69 90 50 34 94 86 59 98 16 99 28 44 37 47 57  7 14 83 67 76  9 77
 Card   4: 45 99 64 82 57  9 56 17 78  7 | 75 56 30 88 64  1 98 27  9 57  7  6 77 44 17 78 82 99 16 91 76 94 63 87 45
@@ -220,4 +288,4 @@ Card 219:  5 55 89 78 12 19 47 64 87 81 | 16 66 55  2 13 10 93 88 39 47 22 54 65
 Card 220: 84 11 98 89 83 95 48 71 45 88 | 14  7 33 52 19 30 66 81 37 57 21  8 47 17 72 95 63 59 29 18 27 26 76 91 73
 Card 221: 78 17 79  4 63 65 56 57 22 92 | 48 94 32 37 26 58 64 87 24 95 19 41 12 25 74 93 30  1 66 27  3 43 50 35 11
 Card 222: 74 14 52 95 73 11 55 26 90 78 | 17 21 93 28 90 61 63 50 19 57 91 66 86 79 62 41  3 23 75 15 56 18 92 83 49
-Card 223: 98 82 47 14  2 48  1 50 18 62 | 67 78 16 58 35 87 93 44 77 13 74 34 32 92 88 54 36 61 91 72  9 59 89 73  5
+Card 223: 98 82 47 14  2 48  1 50 18 62 | 67 78 16 58 35 87 93 44 77 13 74 34 32 92 88 54 36 61 91 72  9 59 89 73  5`

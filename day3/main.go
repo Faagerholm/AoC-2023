@@ -1,4 +1,111 @@
-........................617.........123...........341.........................293..................38..19.753..................533..........
+package main
+
+import (
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+	"unicode"
+)
+
+func main() {
+	lines := strings.Split(input, "\n")
+	re := regexp.MustCompile(`\d+`)
+
+	padding := len(lines[0])
+
+	symbols := make(map[int]rune)
+	numbers := make(map[int]int)
+	for y, line := range lines {
+		for x, c := range line {
+			if unicode.IsDigit(c) || c == '.' {
+				continue
+			}
+			symbols[y*padding+x] = c
+		}
+	}
+
+	hasSymbolsAdjecent := func(lineNr []int, y int) bool {
+		for x := lineNr[0]; x < lineNr[1]; x++ {
+			for _, idx := range []int{
+				(y-1)*padding + x - 1,
+				(y-1)*padding + x,
+				(y-1)*padding + x + 1,
+				y*padding + x - 1,
+				y*padding + x + 1,
+				(y+1)*padding + x - 1,
+				(y+1)*padding + x,
+				(y+1)*padding + x + 1,
+			} {
+				if _, ok := symbols[idx]; ok {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	var partNrs []int
+	for y, line := range lines {
+		idx := re.FindAllStringIndex(line, len(line))
+		for _, partNrIdx := range idx {
+			if hasSymbolsAdjecent(partNrIdx, y) {
+				for x := partNrIdx[0]; x < partNrIdx[1]; x++ {
+					numbers[y*padding+x], _ = strconv.Atoi(line[partNrIdx[0]:partNrIdx[1]])
+				}
+				nr, _ := strconv.Atoi(line[partNrIdx[0]:partNrIdx[1]])
+				partNrs = append(partNrs, nr)
+			}
+		}
+	}
+
+	var sum int
+	for _, n := range partNrs {
+		sum += n
+	}
+	fmt.Printf("Day3 part1 Solution: %d\n", sum)
+
+	// part2
+
+	getAdjecentParts := func(idx int) []int {
+		parts := make(map[int]struct{})
+		for _, i := range []int{
+			idx - padding - 1,
+			idx - padding,
+			idx - padding + 1,
+			idx - 1,
+			idx + 1,
+			idx + padding - 1,
+			idx + padding,
+			idx + padding + 1,
+		} {
+			if nr, ok := numbers[i]; ok {
+				parts[nr] = struct{}{}
+			}
+		}
+		var unique []int
+		for p := range parts {
+			unique = append(unique, p)
+		}
+		return unique
+	}
+	var gears []int
+	for idx, symbol := range symbols {
+		if symbol == '*' {
+			parts := getAdjecentParts(idx)
+			if len(parts) == 2 {
+				gears = append(gears, parts[0]*parts[1])
+			}
+		}
+	}
+
+	sum = 0
+	for _, n := range gears {
+		sum += n
+	}
+	fmt.Printf("Day3 part2 Solution: %d\n", sum)
+}
+
+var input = `........................617.........123...........341.........................293..................38..19.753..................533..........
 565.......................-..............951.....+..........354.....697.58....*.....941............*.....*.........+....529....&.....36.....
 ....1.....225...73...................472.......................-....*......920..999.......646..771.433......407..405.....*.......426*.......
 .....*....*........./227..-113........@...825/.....348...881......603...........%....793...=............235*..............472.........82.941
@@ -137,4 +244,4 @@
 .......=.......137.....313.........=.............998......&....*..........*.....................559..313..825=.....353....405.........296...
 ....447...........#...........342....%.....%........*..938......238.....327..............*152......@...*...................%..472.153.......
 .............152#............*......792...334......741........................570*....335..............137..........338..........*......+...
-952.........................................................793......583..........623............11........730............50.116.........446
+952.........................................................793......583..........623............11........730............50.116.........446`

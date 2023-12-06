@@ -1,4 +1,106 @@
-seeds: 202517468 131640971 1553776977 241828580 1435322022 100369067 2019100043 153706556 460203450 84630899 3766866638 114261107 1809826083 153144153 2797169753 177517156 2494032210 235157184 856311572 542740109
+package main
+
+import (
+	"fmt"
+	"math"
+	"regexp"
+	"strconv"
+	"strings"
+)
+
+type mapper struct {
+	in, out, inc []int
+}
+
+func (m mapper) convert(in int) int {
+	for i := range m.inc {
+		if in >= m.in[i] && in <= m.in[i]+m.inc[i] {
+			return in + m.out[i] - m.in[i]
+		}
+	}
+	return in
+}
+
+func atoia(s string) []int {
+	re := regexp.MustCompile(`(\d+)`)
+	var arr []int
+	for _, d := range re.FindAllString(s, len(s)) {
+		a, _ := strconv.Atoi(d)
+		arr = append(arr, a)
+	}
+	return arr
+}
+
+func main() {
+	lines := strings.Split(input, "\n")
+	seeds := atoia(strings.Split(lines[0], ": ")[1])
+	part1 := day5solver(seeds, lines)
+
+	var seedRange []int
+	for i := 0; i < len(seeds); i += 2 {
+		for j := seeds[i]; j < seeds[i]+seeds[i+1]; j++ {
+			seedRange = append(seedRange, j)
+		}
+	}
+	part2 := day5solver(seedRange, lines)
+	fmt.Printf("Solution part1: %d\n", part1)
+	fmt.Printf("Solution part2: %d\n", part2)
+}
+
+func day5solver(seeds []int, input []string) int {
+	i := 3
+
+	toMap := func(m *mapper) {
+		for ; ; i++ {
+			if i >= len(input) {
+				return
+			}
+			converter := atoia(input[i])
+			if len(converter) != 3 {
+				i += 2
+				return
+			}
+			m.in = append(m.in, converter[1])
+			m.out = append(m.out, converter[0])
+			m.inc = append(m.inc, converter[2])
+		}
+	}
+
+	var seedToSoil mapper
+	var soilToFert mapper
+	var fertToWater mapper
+	var waterToLight mapper
+	var lightToTemp mapper
+	var tempToHum mapper
+	var humToLoc mapper
+	for i < len(input) {
+		toMap(&seedToSoil)
+		toMap(&soilToFert)
+		toMap(&fertToWater)
+		toMap(&waterToLight)
+		toMap(&lightToTemp)
+		toMap(&tempToHum)
+		toMap(&humToLoc)
+	}
+
+	lowest := math.MaxInt
+	for _, seed := range seeds {
+		seed = seedToSoil.convert(seed)
+		seed = soilToFert.convert(seed)
+		seed = fertToWater.convert(seed)
+		seed = waterToLight.convert(seed)
+		seed = lightToTemp.convert(seed)
+		seed = tempToHum.convert(seed)
+		seed = humToLoc.convert(seed)
+		if seed < lowest {
+			lowest = seed
+		}
+	}
+	fmt.Printf("lowest location: %d\n", lowest)
+	return lowest
+}
+
+var input = `seeds: 202517468 131640971 1553776977 241828580 1435322022 100369067 2019100043 153706556 460203450 84630899 3766866638 114261107 1809826083 153144153 2797169753 177517156 2494032210 235157184 856311572 542740109
 
 seed-to-soil map:
 1393363309 644938450 159685707
@@ -210,4 +312,4 @@ humidity-to-location map:
 486913491 589455613 166869411
 4290222100 1538713771 4745196
 220792608 756325024 97387377
-2527540408 1831216396 105005527
+2527540408 1831216396 105005527`

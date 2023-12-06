@@ -1,4 +1,50 @@
-Game 1: 1 green, 2 blue; 13 red, 2 blue, 3 green; 4 green, 14 red
+package main
+
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	lines := strings.Split(input, "\n")
+	max := map[string]int{
+		"red":   12,
+		"green": 13,
+		"blue":  14,
+	}
+	var sumOfLegalGames int
+	var sumOfHighest int
+	for id, line := range lines {
+		games := strings.Split(line, ":")[1]
+		legalGame := true
+		highest := map[string]int{
+			"red":   0,
+			"green": 0,
+			"blue":  0,
+		}
+		for _, game := range strings.Split(games, ";") {
+			for _, gem := range strings.Split(game, ",") {
+				p := strings.Split(strings.TrimSpace(gem), " ")
+				c, _ := strconv.Atoi(p[0])
+				if max[p[1]] < c {
+					legalGame = false
+				}
+				if highest[p[1]] < c {
+					highest[p[1]] = c
+				}
+			}
+		}
+		if legalGame {
+			sumOfLegalGames += id + 1
+		}
+		sumOfHighest += highest["red"] * highest["blue"] * highest["green"]
+	}
+	fmt.Printf("Day2 - part1 Solution: %d\n", sumOfLegalGames)
+	fmt.Printf("Day2 - part2 Solution: %d\n", sumOfHighest)
+}
+
+var input = `Game 1: 1 green, 2 blue; 13 red, 2 blue, 3 green; 4 green, 14 red
 Game 2: 2 blue, 11 green; 4 blue, 12 red, 4 green; 7 red, 1 blue, 9 green; 10 green, 12 red, 6 blue
 Game 3: 1 blue, 12 green, 2 red; 9 red, 16 green; 1 red, 10 green, 1 blue; 1 red, 14 green
 Game 4: 8 green, 18 blue; 4 green, 14 blue, 2 red; 3 blue, 5 green, 11 red
@@ -97,4 +143,4 @@ Game 96: 8 green; 5 blue, 2 red, 4 green; 3 green, 4 red
 Game 97: 5 red, 4 blue; 1 blue, 2 red, 9 green; 10 green, 3 red; 4 green, 3 blue, 4 red; 5 red, 4 green, 3 blue
 Game 98: 3 green, 3 blue, 2 red; 2 blue, 2 red, 1 green; 3 green, 5 blue
 Game 99: 11 green, 4 red, 12 blue; 9 red, 4 blue; 20 green, 6 blue
-Game 100: 12 red, 9 green; 12 red; 9 red, 3 green; 8 red, 4 blue, 4 green; 8 blue, 11 red, 2 green
+Game 100: 12 red, 9 green; 12 red; 9 red, 3 green; 8 red, 4 blue, 4 green; 8 blue, 11 red, 2 green`
